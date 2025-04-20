@@ -1,0 +1,22 @@
+df <- read.csv('R Diss Stuff.csv', stringsAsFactors = FALSE); print(head(df))
+
+# Prepare the data as a contingency table
+contingency_table <- as.matrix(df[, c('Area.A', 'Area.C', 'Area.D')])
+rownames(contingency_table) <- df$Blank.Types
+
+# Run the chi-squared test
+chi_test <- chisq.test(contingency_table)
+
+# Show the test results
+print(chi_test)
+
+# Show the expected counts for reference
+print(chi_test$expected)
+
+# Calculate standardized residuals to see which specific combinations
+# of blank types and areas contribute most to the differences
+std_residuals <- chi_test$residuals
+
+# Print rounded standardized residuals
+print("Standardized Residuals (values > |2| indicate significant deviations):")
+print(round(std_residuals, 2))
