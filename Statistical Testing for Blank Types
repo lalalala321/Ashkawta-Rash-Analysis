@@ -20,3 +20,20 @@ std_residuals <- chi_test$residuals
 # Print rounded standardized residuals
 print("Standardized Residuals (values > |2| indicate significant deviations):")
 print(round(std_residuals, 2))
+
+# Pairwise comparisons between areas
+# Area A vs C
+chisq_AC <- chisq.test(df[, c('Area.A', 'Area.C')])
+# Area A vs D
+chisq_AD <- chisq.test(df[, c('Area.A', 'Area.D')])
+# Area C vs D
+chisq_CD <- chisq.test(df[, c('Area.C', 'Area.D')])
+
+print("\
+Pairwise Chi-square tests:")
+print("Area A vs C:")
+print(chisq_AC$p.value)
+print("Area A vs D:")
+print(chisq_AD$p.value)
+print("Area C vs D:")
+print(chisq_CD$p.value)
