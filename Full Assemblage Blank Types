@@ -1,1 +1,50 @@
+df <- read.csv('R Diss Stuff.csv', stringsAsFactors = FALSE); print(head(df))
 
+# Convert Area columns to numeric for analysis
+cols_to_numeric <- c('Area.A', 'Area.C', 'Area.D')
+df[cols_to_numeric] <- lapply(df[cols_to_numeric], as.numeric)
+
+# Barplot for each Area by Blank Type
+library(ggplot2)
+library(reshape2)
+df_long <- melt(df, id.vars = 'Blank.Types', variable.name = 'Area', value.name = 'Count')
+
+# Plot
+p <- ggplot(df_long, aes(x = Blank.Types, y = Count, fill = Area)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  labs(title = 'Counts by Blank Type and Area', x = 'Blank Type', y = 'Count') +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+print(p)
+
+# Calculate percentages for each area
+df$Area.A.Pct <- (df$Area.A / sum(df$Area.A)) * 100
+df$Area.C.Pct <- (df$Area.C / sum(df$Area.C)) * 100
+df$Area.D.Pct <- (df$Area.D / sum(df$Area.D)) * 100
+
+# Create a data frame with percentages
+pct_df <- data.frame(
+  Blank.Types = df$Blank.Types,
+  'Area A %' = round(df$Area.A.Pct, 1),
+  'Area C %' = round(df$Area.C.Pct, 1),
+  'Area D %' = round(df$Area.D.Pct, 1)
+)
+
+print(pct_df)
+
+# Create a visualization of the percentages
+df_long_pct <- data.frame(
+  Blank.Types = rep(df$Blank.Types, 3),
+  Area = rep(c('Area A', 'Area C', 'Area D'), each = nrow(df)),
+  Percentage = c(df$Area.A.Pct, df$Area.C.Pct, df$Area.D.Pct)
+)
+
+# Create stacked bar plot
+ggplot(df_long_pct, aes(x = Area, y = Percentage, fill = Blank.Types)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Percentage Distribution of Blank Types by Area",
+       y = "Percentage",
+       x = "Area") +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme(legend.position = "right")
