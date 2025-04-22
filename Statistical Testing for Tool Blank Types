@@ -1,0 +1,61 @@
+# Convert data to numeric matrix for chi-square test
+matrix_data <- matrix(
+  c(49, 46, 28,    # Flake counts
+    52, 34, 37,    # Blade counts
+    137, 68, 67,   # Bladelet counts
+    83, 54, 44),   # Indeterminate counts
+  nrow = 4, 
+  byrow = TRUE,
+  dimnames = list(
+    c("Flake", "Blade", "Bladelet", "Indeterminate"),
+    c("Area A", "Area C", "Area D")
+  )
+)
+
+# Perform chi-square test
+chi_test <- chisq.test(matrix_data)
+
+# Print results
+print("Contingency Table:")
+print(matrix_data)
+print("\
+Chi-square Test Results:")
+print(chi_test)
+
+# Calculate and print expected frequencies
+print("\
+Expected Frequencies:")
+print(chi_test$expected)
+
+# Calculate contribution to chi-square
+contrib <- (matrix_data - chi_test$expected)^2 / chi_test$expected
+print("\
+Contribution to chi-square:")
+print(contrib)
+
+# Pairwise chi-square tests between areas
+# Prepare pairwise tables
+pair_A_C <- matrix_data[, c('Area A', 'Area C')]
+pair_A_D <- matrix_data[, c('Area A', 'Area D')]
+pair_C_D <- matrix_data[, c('Area C', 'Area D')]
+
+# Run chi-square tests
+chi_A_C <- chisq.test(pair_A_C)
+chi_A_D <- chisq.test(pair_A_D)
+chi_C_D <- chisq.test(pair_C_D)
+
+# Print results for each pair
+cat('Area A vs Area C\
+')
+print(pair_A_C)
+print(chi_A_C)
+cat('\
+Area A vs Area D\
+')
+print(pair_A_D)
+print(chi_A_D)
+cat('\
+Area C vs Area D\
+')
+print(pair_C_D)
+print(chi_C_D)
