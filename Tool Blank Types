@@ -1,1 +1,42 @@
+library(ggplot2)
+library(tidyr)
 
+# Reshape the data for easier plotting
+long_df <- pivot_longer(df, cols = c('Area A', 'Area C', 'Area D'), names_to = 'Area', values_to = 'Count')
+
+# Convert Count to numeric
+long_df$Count <- as.numeric(long_df$Count)
+
+# Plot
+p <- ggplot(long_df, aes(x = `Tool Blank Types`, y = Count, fill = Area)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  labs(title = 'Tool Blank Types by Area', x = 'Tool Blank Type', y = 'Count') +
+  theme_minimal()
+print(p)
+
+library(dplyr)
+
+# Calculate percentages
+percentages <- df %>%
+  pivot_longer(cols = c('Area A', 'Area C', 'Area D'), 
+               names_to = 'Area', 
+               values_to = 'Count') %>%
+  group_by(Area) %>%
+  mutate(Count = as.numeric(Count),
+         Total = sum(Count),
+         Percentage = (Count/Total) * 100)
+
+# Create the plot
+ggplot(percentages, aes(x = Area, y = Percentage, fill = `Tool Blank Types`)) +
+  geom_bar(stat = 'identity', position = 'fill') +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  labs(title = 'Percentage Distribution of Tool Blank Types by Area',
+       x = 'Area',
+       y = 'Percentage',
+       fill = 'Tool Type') +
+  theme_minimal()
+
+# Print the actual percentages
+print(percentages %>% 
+      select(Area, `Tool Blank Types`, Percentage) %>%
+      arrange(Area, `Tool Blank Types`))
